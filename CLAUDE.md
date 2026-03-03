@@ -79,6 +79,22 @@ The `manhuagui_client.rs` scrapes HTML responses using the `scraper` crate. Key 
 - `src-tauri/src/types/` - Type definitions with `from_html()` methods
 - `src-tauri/src/decrypt.rs` - Decrypts image URLs from JavaScript-obfuscated data
 
+### Browser Headers
+
+To avoid 403 Forbidden errors from manhuagui.com, all HTTP requests include browser-like headers:
+- `User-Agent`: Chrome 120.0 on Windows 10
+- `Accept`: Standard browser Accept header
+- `Accept-Language`: zh-CN,zh;q=0.9,en;q=0.8
+- `Referer`: Dynamically set based on request path
+
+See `manhuagui_client.rs` for the implementation.
+
+### UI Features
+
+- **Login Retry Button**: When `getUserProfile()` fails, a red "重试登录" button appears next to the login button. Clicking it retries using the existing cookie.
+- **Favorite Page Refresh**: The 漫画收藏 page has a "刷新" button in the bottom-left corner that remains visible even during network errors.
+- **Session-only Download List**: The download queue is stored in memory only (not persisted). Use 本地库存 to view downloaded comics.
+
 ### Project Structure
 
 ```
