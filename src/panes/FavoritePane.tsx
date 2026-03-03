@@ -1,6 +1,6 @@
 import { Comic, commands, GetFavoriteResult, UserProfile } from '../bindings.ts'
 import { CurrentTabName } from '../types.ts'
-import { Pagination } from 'antd'
+import { Button, Pagination } from 'antd'
 import { useCallback, useEffect, useState } from 'react'
 import ComicCard from '../components/ComicCard.tsx'
 
@@ -32,8 +32,8 @@ function FavoritePane({ userProfile, setPickedComic, setCurrentTabName }: Props)
 
   return (
     <div className="h-full flex flex-col">
-      {getFavoriteResult && (
-        <div className="h-full flex flex-col gap-row-1 overflow-auto">
+      <div className="flex flex-col flex-1 overflow-auto">
+        {getFavoriteResult && (
           <div className="h-full flex flex-col gap-row-2 overflow-auto p-2">
             {getFavoriteResult.comics.map((comic) => (
               <ComicCard
@@ -48,6 +48,16 @@ function FavoritePane({ userProfile, setPickedComic, setCurrentTabName }: Props)
               />
             ))}
           </div>
+        )}
+      </div>
+      <div className="flex items-center justify-between px-2 py-2">
+        <Button
+          className="w-20"
+          size="small"
+          onClick={() => getFavourite(favoritePageNum)}>
+          刷新
+        </Button>
+        {getFavoriteResult && (
           <Pagination
             current={favoritePageNum}
             pageSize={20}
@@ -56,8 +66,8 @@ function FavoritePane({ userProfile, setPickedComic, setCurrentTabName }: Props)
             simple
             onChange={(pageNum) => getFavourite(pageNum)}
           />
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }

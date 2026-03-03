@@ -76,6 +76,9 @@ impl ManhuaguiClient {
             .api_client
             .get("https://www.manhuagui.com/user/center/index")
             .header("cookie", cookie)
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+            .header("Referer", "https://www.manhuagui.com/")
             .send_with_timeout_msg()
             .await?;
         // 检查http响应状态码
@@ -93,7 +96,14 @@ impl ManhuaguiClient {
 
     pub async fn search(&self, keyword: &str, page_num: i64) -> anyhow::Result<SearchResult> {
         let url = format!("https://www.manhuagui.com/s/{keyword}_p{page_num}.html");
-        let http_resp = self.api_client.get(url).send_with_timeout_msg().await?;
+        let http_resp = self
+            .api_client
+            .get(url)
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+            .header("Referer", "https://www.manhuagui.com/")
+            .send_with_timeout_msg()
+            .await?;
         let status = http_resp.status();
         let body = http_resp.text().await?;
         if status != StatusCode::OK {
@@ -108,6 +118,9 @@ impl ManhuaguiClient {
         let http_resp = self
             .api_client
             .get(format!("https://www.manhuagui.com/comic/{id}/"))
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+            .header("Referer", "https://www.manhuagui.com/")
             .send_with_timeout_msg()
             .await?;
         let status = http_resp.status();
@@ -125,7 +138,14 @@ impl ManhuaguiClient {
         let chapter_id = chapter_info.chapter_id;
 
         let url = format!("https://www.manhuagui.com/comic/{comic_id}/{chapter_id}.html");
-        let http_resp = self.api_client.get(url).send_with_timeout_msg().await?;
+        let http_resp = self
+            .api_client
+            .get(url)
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+            .header("Referer", format!("https://www.manhuagui.com/comic/{comic_id}/"))
+            .send_with_timeout_msg()
+            .await?;
         let status = http_resp.status();
         let body = http_resp.text().await?;
         if status != StatusCode::OK {
@@ -172,6 +192,9 @@ impl ManhuaguiClient {
             .api_client
             .get(url)
             .header("cookie", cookie)
+            .header("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8")
+            .header("Accept-Language", "zh-CN,zh;q=0.9,en;q=0.8")
+            .header("Referer", "https://www.manhuagui.com/user/center/index")
             .send_with_timeout_msg()
             .await?;
         // 检查http响应状态码
@@ -196,6 +219,7 @@ fn create_api_client() -> ClientWithMiddleware {
     let client = reqwest::ClientBuilder::new()
         .timeout(Duration::from_secs(3)) // 每个请求超过3秒就超时
         .redirect(reqwest::redirect::Policy::none())
+        .user_agent("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36")
         .build()
         .unwrap();
 

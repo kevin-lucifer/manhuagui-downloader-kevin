@@ -24,6 +24,7 @@ function AppContent({ config, setConfig }: Props) {
   const [logViewerShowing, setLogViewerShowing] = useState<boolean>(false)
   const [aboutDialogShowing, setAboutDialogShowing] = useState<boolean>(false)
   const [pickedComic, setPickedComic] = useState<Comic>()
+  const [loginError, setLoginError] = useState<boolean>(false)
 
   useEffect(() => {
     if (config === undefined) {
@@ -37,6 +38,8 @@ function AppContent({ config, setConfig }: Props) {
 
   useEffect(() => {
     if (config.cookie === '') {
+      setUserProfile(undefined)
+      setLoginError(false)
       return
     }
 
@@ -44,10 +47,13 @@ function AppContent({ config, setConfig }: Props) {
       if (result.status === 'error') {
         console.error(result.error)
         setUserProfile(undefined)
+        setLoginError(true)
+        message.error('登录状态失效，请重新登录')
         return
       }
 
       setUserProfile(result.data)
+      setLoginError(false)
       message.success('获取用户信息成功')
     })
   }, [config.cookie, message])
@@ -99,6 +105,24 @@ function AppContent({ config, setConfig }: Props) {
         <Button type="primary" onClick={() => setLoginDialogShowing(true)}>
           账号登录
         </Button>
+        {loginError && config.cookie && (
+          <Button type="primary" danger onClick={async () => {
+            const key = 'retry'
+            message.loading({ content: '重新获取用户信息...', key, duration: 0 })
+            const result = await commands.getUserProfile()
+            message.destroy(key)
+            if (result.status === 'error') {
+              console.error(result.error)
+              message.error('重新获取失败，请检查网络或重新登录')
+              return
+            }
+            message.success('获取用户信息成功')
+            setUserProfile(result.data)
+            setLoginError(false)
+          }}>
+            重试登录
+          </Button>
+        )}
         <Button onClick={() => setLogViewerShowing(true)}>查看日志</Button>
         <Button onClick={() => setAboutDialogShowing(true)}>关于</Button>
         {userProfile !== undefined && (
